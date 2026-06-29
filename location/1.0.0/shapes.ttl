@@ -1,24 +1,23 @@
-																	
-																			   
+@prefix saploc:   <https://w3id.org/cnr-ismar/sap/location/1.0.0/> .
+@prefix locshape: <https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl#> .
 
-														   
-											   
-														   
-														  
-												
-												 
-																 
-													   
-													
+@prefix geo:      <http://www.opengis.net/ont/geosparql#> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix sh:       <http://www.w3.org/ns/shacl#> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
 
-														  
-					
-																			  
-																																																 
-							  
-							 
-													   
-
+<https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl>
+    a owl:Ontology ;
+    dcterms:title "CNR ISMAR Location Application Profile - SHACL Shapes"@en ;
+    dcterms:description "SHACL shapes for validating RDF descriptions of locations represented as GeoSPARQL Features with associated WKT geometries and research infrastructure membership."@en ;
+    dcterms:isPartOf saploc: ;
+    owl:versionInfo "1.0.0" ;
+    dcterms:conformsTo <https://www.w3.org/TR/shacl/> .																	
 
 ###############################################################################
 # Location shape
