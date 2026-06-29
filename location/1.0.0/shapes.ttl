@@ -149,17 +149,9 @@ Facilities theme and must have exactly one associated GeoSPARQL Geometry.
 
     ###########################################################################
     # dcterms:conformsTo
-    #
-							   
-	 
     # Required.
     # Exactly one value.
-    # Must point to the INSPIRE Environmental Monitoring Facilities theme.
-																	   
-	 
-							   
-	 
-							
+    # Must point to the INSPIRE Environmental Monitoring Facilities theme.							
     ###########################################################################
 
     sh:property [
@@ -175,12 +167,6 @@ Facilities theme and must have exactly one associated GeoSPARQL Geometry.
 
     ###########################################################################
     # dcterms:isPartOf
-    #
-			   
-	 
-																		
-							   
-	 
     # Optional.
     # May point to a research infrastructure or other aggregating resource.
     # The referenced resource is not validated by this Location profile.
