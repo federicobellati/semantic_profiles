@@ -18,3 +18,195 @@
     dcterms:isPartOf saploc: ;
     owl:versionInfo "1.0.0" ;
     dcterms:conformsTo <https://www.w3.org/TR/shacl/> .
+
+
+###############################################################################
+# Location shape
+###############################################################################
+
+locshape:LocationShape
+    a sh:NodeShape ;
+
+    sh:name "Location"@en ;
+    sh:description """
+A location represented as a GeoSPARQL Feature.
+
+According to this application profile, a location must provide human-readable
+labels and descriptive metadata, must be associated with at least one research
+infrastructure, and must have exactly one geometry represented as a GeoSPARQL
+Geometry.
+"""@en ;
+
+    ###########################################################################
+    # Target
+    #
+    # This shape validates every resource explicitly typed as geo:Feature.
+    ###########################################################################
+
+    sh:targetClass geo:Feature ;
+
+    ###########################################################################
+    # rdf:type geo:Feature
+    ###########################################################################
+
+    sh:property [
+        sh:path rdf:type ;
+        sh:minCount 1 ;
+        sh:hasValue geo:Feature ;
+        sh:message "A location must be explicitly typed as geo:Feature."@en ;
+    ] ;
+
+    ###########################################################################
+    # rdfs:label
+    #
+    # Required.
+    # Must be a language-tagged string.
+    # Allows one value per language.
+    ###########################################################################
+
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:datatype rdf:langString ;
+        sh:uniqueLang true ;
+        sh:message "A location must have at least one rdfs:label with a language tag. Only one rdfs:label per language is allowed."@en ;
+    ] ;
+
+    ###########################################################################
+    # skos:altLabel
+    #
+    # Optional.
+    # Must be a language-tagged string when present.
+    # Allows one value per language.
+    ###########################################################################
+
+    sh:property [
+        sh:path skos:altLabel ;
+        sh:minCount 0 ;
+        sh:datatype rdf:langString ;
+        sh:uniqueLang true ;
+        sh:message "Alternative labels, when present, must be language-tagged literals. Only one skos:altLabel per language is allowed."@en ;
+    ] ;
+
+    ###########################################################################
+    # dcterms:title
+    #
+    # Required.
+    # Must be a language-tagged string.
+    ###########################################################################
+
+    sh:property [
+        sh:path dcterms:title ;
+        sh:minCount 1 ;
+        sh:datatype rdf:langString ;
+        sh:uniqueLang true ;
+        sh:message "A location must have at least one dcterms:title with a language tag. Only one dcterms:title per language is allowed."@en ;
+    ] ;
+
+    ###########################################################################
+    # dcterms:description
+    #
+    # Required.
+    # Must be a language-tagged string.
+    ###########################################################################
+
+    sh:property [
+        sh:path dcterms:description ;
+        sh:minCount 1 ;
+        sh:datatype rdf:langString ;
+        sh:uniqueLang true ;
+        sh:message "A location must have at least one dcterms:description with a language tag. Only one dcterms:description per language is allowed."@en ;
+    ] ;
+
+    ###########################################################################
+    # dcterms:conformsTo
+    #
+    # Optional in this version.
+    #
+    # It can be used, for example, to point to INSPIRE, to this SAP, or to other
+    # standards/profiles.
+    #
+    # If you later want to make conformance to this SAP mandatory, add:
+    #
+    #     sh:hasValue saploc: ;
+    #
+    # and set sh:minCount 1.
+    ###########################################################################
+
+    sh:property [
+        sh:path dcterms:conformsTo ;
+        sh:minCount 0 ;
+        sh:nodeKind sh:IRI ;
+        sh:message "dcterms:conformsTo, when present, must point to an IRI identifying a standard, profile, specification or controlled resource."@en ;
+    ] ;
+
+    ###########################################################################
+    # dcterms:isPartOf
+    #
+    # Required.
+    #
+    # The location must be part of at least one research infrastructure.
+    # The value must be an IRI.
+    #
+    # This version also requires the referenced resource to conform to
+    # locshape:ResearchInfrastructureShape.
+    ###########################################################################
+
+    sh:property [
+        sh:path dcterms:isPartOf ;
+        sh:minCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:node locshape:ResearchInfrastructureShape ;
+        sh:message "A location must be part of at least one research infrastructure. Each value of dcterms:isPartOf must be an IRI and must conform to ResearchInfrastructureShape."@en ;
+    ] ;
+
+    ###########################################################################
+    # foaf:depiction
+    #
+    # Optional.
+    # If present, it must be an IRI.
+    ###########################################################################
+
+    sh:property [
+        sh:path foaf:depiction ;
+        sh:minCount 0 ;
+        sh:nodeKind sh:IRI ;
+        sh:message "foaf:depiction, when present, must be an IRI."@en ;
+    ] ;
+
+    ###########################################################################
+    # geo:hasMetricSpatialAccuracy
+    #
+    # Optional.
+    # Maximum one value.
+    # Must be a non-negative xsd:double.
+    ###########################################################################
+
+    sh:property [
+        sh:path geo:hasMetricSpatialAccuracy ;
+        sh:minCount 0 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:double ;
+        sh:minInclusive 0.0 ;
+        sh:message "Metric spatial accuracy, when present, must be a single non-negative xsd:double."@en ;
+    ] ;
+
+    ###########################################################################
+    # geo:hasGeometry
+    #
+    # Required.
+    # Exactly one geometry.
+    # The geometry must be identified by an IRI.
+    # The geometry must be explicitly typed as geo:Geometry.
+    # The geometry node must conform to locshape:GeometryShape.
+    ###########################################################################
+
+    sh:property [
+        sh:path geo:hasGeometry ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:class geo:Geometry ;
+        sh:node locshape:GeometryShape ;
+        sh:message "A location must have exactly one geo:hasGeometry value. The geometry must be an IRI, must be typed as geo:Geometry, and must conform to GeometryShape."@en ;
+    ] .
