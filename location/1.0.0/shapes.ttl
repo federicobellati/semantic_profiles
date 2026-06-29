@@ -1,23 +1,23 @@
-@prefix saploc:   <https://w3id.org/cnr-ismar/sap/location/1.0.0/> .
-@prefix locshape: <https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl#> .
+																	
+																			   
 
-@prefix geo:      <http://www.opengis.net/ont/geosparql#> .
-@prefix dcterms:  <http://purl.org/dc/terms/> .
-@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
-@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
-@prefix sh:       <http://www.w3.org/ns/shacl#> .
-@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
-@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+														   
+											   
+														   
+														  
+												
+												 
+																 
+													   
+													
 
-<https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl>
-    a owl:Ontology ;
-    dcterms:title "CNR ISMAR Location Application Profile - SHACL Shapes"@en ;
-    dcterms:description "SHACL shapes for validating RDF descriptions of locations represented as GeoSPARQL Features with associated WKT geometries and research infrastructure membership."@en ;
-    dcterms:isPartOf saploc: ;
-    owl:versionInfo "1.0.0" ;
-    dcterms:conformsTo <https://www.w3.org/TR/shacl/> .
+														  
+					
+																			  
+																																																 
+							  
+							 
+													   
 
 
 ###############################################################################
@@ -31,10 +31,16 @@ locshape:LocationShape
     sh:description """
 A location represented as a GeoSPARQL Feature.
 
-According to this application profile, a location must provide human-readable
-labels and descriptive metadata, must be associated with at least one research
-infrastructure, and must have exactly one geometry represented as a GeoSPARQL
-Geometry.
+According to this application profile, a location must provide a single
+human-readable name expressed both as rdfs:label and dcterms:title for
+cross-vocabulary interoperability. The two values must be identical.
+
+The name is expressed as a language-tagged literal using the undetermined
+language tag @und.
+
+A location must declare conformance to the INSPIRE Environmental Monitoring
+Facilities theme and must have exactly one associated GeoSPARQL Geometry.
+		 
 """@en ;
 
     ###########################################################################
@@ -51,7 +57,9 @@ Geometry.
 
     sh:property [
         sh:path rdf:type ;
-        sh:minCount 1 ;
+        sh:name "Resource type"@en ;
+        sh:description "The resource must be explicitly typed as a GeoSPARQL Feature."@en ;
+        sh:order 1 ;
         sh:hasValue geo:Feature ;
         sh:message "A location must be explicitly typed as geo:Feature."@en ;
     ] ;
@@ -60,47 +68,65 @@ Geometry.
     # rdfs:label
     #
     # Required.
-    # Must be a language-tagged string.
-    # Allows one value per language.
+    # Exactly one value.
+    # Must be a language-tagged string using @und.
+    # Must be identical to dcterms:title.
     ###########################################################################
 
     sh:property [
         sh:path rdfs:label ;
+        sh:name "Name"@en ;
+        sh:description "The human-readable name of the location. The value must be identical to dcterms:title and must use the @und language tag."@en ;
+        sh:order 2 ;
         sh:minCount 1 ;
+        sh:maxCount 1 ;
         sh:datatype rdf:langString ;
-        sh:uniqueLang true ;
-        sh:message "A location must have at least one rdfs:label with a language tag. Only one rdfs:label per language is allowed."@en ;
-    ] ;
-
-    ###########################################################################
-    # skos:altLabel
-    #
-    # Optional.
-    # Must be a language-tagged string when present.
-    # Allows one value per language.
-    ###########################################################################
-
-    sh:property [
-        sh:path skos:altLabel ;
-        sh:minCount 0 ;
-        sh:datatype rdf:langString ;
-        sh:uniqueLang true ;
-        sh:message "Alternative labels, when present, must be language-tagged literals. Only one skos:altLabel per language is allowed."@en ;
+        sh:languageIn ( "und" ) ;
+        sh:equals dcterms:title ;
+        sh:message "A location must have exactly one rdfs:label using the @und language tag, and it must be identical to dcterms:title."@en ;
     ] ;
 
     ###########################################################################
     # dcterms:title
     #
     # Required.
-    # Must be a language-tagged string.
+    # Exactly one value.
+    # Must be a language-tagged string using @und.
+    #
+    # Equality with rdfs:label is enforced by the rdfs:label property shape
+    # through sh:equals dcterms:title.
     ###########################################################################
 
     sh:property [
         sh:path dcterms:title ;
+        sh:name "Title"@en ;
+        sh:description "The title of the location, provided for cross-vocabulary interoperability. It must be identical to rdfs:label and must use the @und language tag."@en ;
+        sh:order 3 ;
         sh:minCount 1 ;
+        sh:maxCount 1 ;
         sh:datatype rdf:langString ;
-        sh:uniqueLang true ;
-        sh:message "A location must have at least one dcterms:title with a language tag. Only one dcterms:title per language is allowed."@en ;
+        sh:languageIn ( "und" ) ;
+        sh:message "A location must have exactly one dcterms:title using the @und language tag, and it must be identical to rdfs:label."@en ;
+    ] ;
+
+    ###########################################################################
+    # skos:altLabel
+    #
+    # Optional.
+    # Maximum one value.
+    # Must be a language-tagged string using @und.
+    ###########################################################################
+
+    sh:property [
+        sh:path skos:altLabel ;
+        sh:name "Alternative name"@en ;
+        sh:description "An optional alternative name for the location. At most one alternative label is allowed and it must use the @und language tag."@en ;
+        sh:order 4 ;
+        sh:minCount 0 ;
+        sh:maxCount 1 ;
+        sh:datatype rdf:langString ;
+        sh:languageIn ( "und" ) ;
+        sh:message "skos:altLabel, when present, must be a single language-tagged literal using the @und language tag."@en ;
     ] ;
 
     ###########################################################################
@@ -108,10 +134,14 @@ Geometry.
     #
     # Required.
     # Must be a language-tagged string.
+    # Allows one value per language.
     ###########################################################################
 
     sh:property [
         sh:path dcterms:description ;
+        sh:name "Description"@en ;
+        sh:description "A textual description of the location. The description must be provided as a language-tagged literal. Only one description per language is allowed."@en ;
+        sh:order 5 ;
         sh:minCount 1 ;
         sh:datatype rdf:langString ;
         sh:uniqueLang true ;
@@ -121,43 +151,51 @@ Geometry.
     ###########################################################################
     # dcterms:conformsTo
     #
-    # Optional in this version.
-    #
-    # It can be used, for example, to point to INSPIRE, to this SAP, or to other
-    # standards/profiles.
-    #
-    # If you later want to make conformance to this SAP mandatory, add:
-    #
-    #     sh:hasValue saploc: ;
-    #
-    # and set sh:minCount 1.
+							   
+	 
+    # Required.
+    # Exactly one value.
+    # Must point to the INSPIRE Environmental Monitoring Facilities theme.
+																	   
+	 
+							   
+	 
+							
     ###########################################################################
 
     sh:property [
         sh:path dcterms:conformsTo ;
-        sh:minCount 0 ;
-        sh:nodeKind sh:IRI ;
-        sh:message "dcterms:conformsTo, when present, must point to an IRI identifying a standard, profile, specification or controlled resource."@en ;
+        sh:name "INSPIRE conformance"@en ;
+        sh:description "The location must declare conformance to the INSPIRE Environmental Monitoring Facilities theme."@en ;
+        sh:order 6 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:hasValue <http://inspire.ec.europa.eu/theme/ef> ;
+        sh:message "A location must declare dcterms:conformsTo <http://inspire.ec.europa.eu/theme/ef>."@en ;
     ] ;
 
     ###########################################################################
     # dcterms:isPartOf
     #
-    # Required.
-    #
-    # The location must be part of at least one research infrastructure.
-    # The value must be an IRI.
-    #
-    # This version also requires the referenced resource to conform to
-    # locshape:ResearchInfrastructureShape.
+			   
+	 
+																		
+							   
+	 
+    # Optional.
+    # May point to a research infrastructure or other aggregating resource.
+    # The referenced resource is not validated by this Location profile.
     ###########################################################################
 
     sh:property [
         sh:path dcterms:isPartOf ;
-        sh:minCount 1 ;
+        sh:name "Part of"@en ;
+        sh:description "An optional reference to a research infrastructure or another aggregating resource of which the location is part. The value must be an IRI. The referenced resource is not validated by this Location profile."@en ;
+        sh:order 7 ;
+        sh:minCount 0 ;
         sh:nodeKind sh:IRI ;
-        sh:node locshape:ResearchInfrastructureShape ;
-        sh:message "A location must be part of at least one research infrastructure. Each value of dcterms:isPartOf must be an IRI and must conform to ResearchInfrastructureShape."@en ;
+													  
+        sh:message "dcterms:isPartOf, when present, must be an IRI."@en ;
     ] ;
 
     ###########################################################################
@@ -169,6 +207,9 @@ Geometry.
 
     sh:property [
         sh:path foaf:depiction ;
+        sh:name "Depiction"@en ;
+        sh:description "An optional image or visual depiction of the location. The value must be an IRI."@en ;
+        sh:order 8 ;
         sh:minCount 0 ;
         sh:nodeKind sh:IRI ;
         sh:message "foaf:depiction, when present, must be an IRI."@en ;
@@ -179,16 +220,27 @@ Geometry.
     #
     # Optional.
     # Maximum one value.
-    # Must be a non-negative xsd:double.
+    # Must be a non-negative numeric value.
+    # Accepted datatypes:
+    # - xsd:integer
+    # - xsd:decimal
+    # - xsd:double
     ###########################################################################
 
     sh:property [
         sh:path geo:hasMetricSpatialAccuracy ;
+        sh:name "Metric spatial accuracy"@en ;
+        sh:description "The spatial accuracy of the geometry, expressed in meters as a non-negative numeric value. Accepted datatypes are xsd:integer, xsd:decimal and xsd:double."@en ;
+        sh:order 9 ;
         sh:minCount 0 ;
         sh:maxCount 1 ;
-        sh:datatype xsd:double ;
-        sh:minInclusive 0.0 ;
-        sh:message "Metric spatial accuracy, when present, must be a single non-negative xsd:double."@en ;
+        sh:or (
+            [ sh:datatype xsd:integer ]
+            [ sh:datatype xsd:decimal ]
+            [ sh:datatype xsd:double ]
+        ) ;
+        sh:minInclusive 0 ;
+        sh:message "Metric spatial accuracy, when present, must be a single non-negative numeric value using xsd:integer, xsd:decimal or xsd:double."@en ;
     ] ;
 
     ###########################################################################
@@ -203,6 +255,9 @@ Geometry.
 
     sh:property [
         sh:path geo:hasGeometry ;
+        sh:name "Geometry"@en ;
+        sh:description "The single GeoSPARQL geometry associated with the location. The geometry must be an IRI, must be typed as geo:Geometry, and must conform to GeometryShape."@en ;
+        sh:order 10 ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:nodeKind sh:IRI ;
