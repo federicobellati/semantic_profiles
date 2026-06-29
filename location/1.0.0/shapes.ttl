@@ -212,3 +212,52 @@ and elevation is expressed in metres.
         sh:node locshape:GeometryShape ;
         sh:message "A location must have exactly one geo:hasGeometry value. The geometry must be an IRI, must be typed as geo:Geometry and must conform to GeometryShape."@en ;
     ] .
+
+
+###############################################################################
+# Geometry shape
+###############################################################################
+
+locshape:GeometryShape
+    a sh:NodeShape ;
+
+    sh:name "Geometry"@en ;
+    sh:description """
+A GeoSPARQL geometry encoded as a three-dimensional WKT literal.
+
+The geometry shall use CRS EPSG:4979 and shall be encoded as:
+
+POINT Z(longitude latitude elevation)
+
+Longitude and latitude are expressed in decimal degrees.
+Elevation is expressed as WGS84 ellipsoidal height in metres and
+may be positive or negative.
+"""@en ;
+
+    ###########################################################################
+    # rdf:type
+    ###########################################################################
+
+    sh:property [
+        sh:path rdf:type ;
+        sh:hasValue geo:Geometry ;
+        sh:name "Geometry type"@en ;
+        sh:message "The geometry must be explicitly typed as geo:Geometry."@en ;
+    ] ;
+
+    ###########################################################################
+    # geo:asWKT
+    ###########################################################################
+
+    sh:property [
+        sh:path geo:asWKT ;
+        sh:name "WKT geometry"@en ;
+        sh:description "Three-dimensional WKT literal encoded using EPSG:4979."@en ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype geo:wktLiteral ;
+
+        sh:pattern "^<http://www\\.opengis\\.net/def/crs/EPSG/0/4979>\\s+POINT\\s+Z\\s*\\([-+]?[0-9]+(\\.[0-9]+)?\\s+[-+]?[0-9]+(\\.[0-9]+)?\\s+[-+]?[0-9]+(\\.[0-9]+)?\\s*\\)$" ;
+
+        sh:message "The WKT geometry must use EPSG:4979 and be encoded as POINT Z(longitude latitude elevation)."@en ;
+    ] .
