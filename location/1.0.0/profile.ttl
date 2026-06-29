@@ -1,1 +1,63 @@
+@prefix saploc:   <https://w3id.org/cnr-ismar/sap/location/1.0.0/> .
+@prefix prof:     <http://www.w3.org/ns/dx/prof/> .
+@prefix role:     <http://www.w3.org/ns/dx/prof/role/> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix dcat:     <http://www.w3.org/ns/dcat#> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
 
+saploc:
+    a prof:Profile ;
+    a dcterms:Standard ;
+    dcterms:title "CNR ISMAR Semantic Application Profile for Locations"@en ;
+    dcterms:description "Application profile for describing locations as GeoSPARQL Features with associated WKT geometries."@en ;
+    dcterms:identifier "cnr-ismar-sap-location-1.0.0" ;
+    owl:versionInfo "1.0.0" ;
+    dcterms:issued "2026-06-29"^^xsd:date ;
+    dcterms:creator <https://w3id.org/cnr-ismar/organization/ismar> ;
+    dcterms:publisher <https://w3id.org/cnr-ismar/organization/ismar> ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+
+    dcterms:conformsTo <https://www.w3.org/TR/shacl/> ;
+    dcterms:conformsTo <https://www.ogc.org/standards/geosparql/> ;
+
+    prof:hasResource saploc:shacl-resource ;
+    prof:hasResource saploc:html-documentation-resource ;
+    prof:hasResource saploc:examples-resource .
+
+###############################################################################
+# SHACL validation resource
+###############################################################################
+
+saploc:shacl-resource
+    a prof:ResourceDescriptor ;
+    dcterms:title "SHACL shapes for the CNR ISMAR Location Application Profile"@en ;
+    dcterms:description "SHACL shapes used to validate RDF descriptions of locations conforming to this application profile."@en ;
+    prof:hasRole role:validation ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    prof:hasArtifact <https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl> .
+
+###############################################################################
+# Human-readable documentation
+###############################################################################
+
+saploc:html-documentation-resource
+    a prof:ResourceDescriptor ;
+    dcterms:title "Human-readable documentation"@en ;
+    dcterms:description "HTML documentation of the CNR ISMAR Location Application Profile."@en ;
+    prof:hasRole role:guidance ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/html> ;
+    prof:hasArtifact <https://w3id.org/cnr-ismar/sap/location/1.0.0/doc> .
+
+###############################################################################
+# Examples
+###############################################################################
+
+saploc:examples-resource
+    a prof:ResourceDescriptor ;
+    dcterms:title "RDF examples"@en ;
+    dcterms:description "Valid and invalid RDF examples for the CNR ISMAR Location Application Profile."@en ;
+    prof:hasRole role:example ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    prof:hasArtifact <https://w3id.org/cnr-ismar/sap/location/1.0.0/examples/> .
