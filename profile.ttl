@@ -1,0 +1,13 @@
+cnrobs:
+    a prof:Profile ;
+    dcterms:title "CNR ISMAR Semantic Application Profile for Observational Architectures"@en ;
+    prof:isProfileOf <http://www.w3.org/ns/sosa/> ;
+    prof:isProfileOf <http://www.w3.org/ns/ssn/> ;
+    prof:isProfileOf <http://www.opengis.net/ont/geosparql#> ;
+    dcterms:conformsTo <https://www.w3.org/TR/vocab-ssn/> ;
+    dcterms:conformsTo <https://www.ogc.org/standards/geosparql/> ;
+    prof:hasResource <.../location/1.0.0/> ;
+    prof:hasResource <.../thing/1.0.0/> ;
+    prof:hasResource <.../sensor/1.0.0/> ;
+    prof:hasResource <.../datastream/1.0.0/> ;
+    prof:hasResource <.../featureOfInterest/1.0.0/> .
