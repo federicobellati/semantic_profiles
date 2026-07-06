@@ -2,6 +2,7 @@
 @prefix locshape: <https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl#> .
 
 @prefix geo:      <http://www.opengis.net/ont/geosparql#> .
+@prefix gn:       <https://www.geonames.org/ontology#> .
 @prefix dcterms:  <http://purl.org/dc/terms/> .
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
@@ -27,6 +28,25 @@ https://w3id.org/cnr-ismar/resource/location/{ID}
 
 where {ID} is a local identifier composed of letters, numbers, hyphens or
 underscores, starting with a letter or number.
+
+The profile requires a country code associated with the declared coordinates.
+The property used for this purpose is gn:countryCode from the GeoNames
+Ontology, whose value is a two-letter country code from the ISO 3166 list.
+
+Officially assigned ISO 3166-1 alpha-2 codes should be used where applicable.
+For example, IT for Italy, DE for Germany, GB for the United Kingdom, and AQ
+for Antarctica.
+
+For locations in international waters or areas beyond national jurisdiction,
+this application profile allows the ISO 3166-1 alpha-2 user-assigned code ZZ
+with the profile-specific meaning "international waters / areas beyond
+national jurisdiction". This is a CNR ISMAR SAP convention and must not be
+interpreted as an officially assigned ISO country code.
+
+For marine regions, exclusive economic zones, territorial seas, high seas or
+other maritime areas, the use of dcterms:spatial pointing to authoritative
+marine gazetteer resources, such as Marine Regions MRGID resources, is
+recommended where applicable.
 """@en ;
     dcterms:isPartOf saploc: ;
     owl:versionInfo "1.0.0" ;
@@ -79,6 +99,19 @@ canonical UUID textual representation.
 
 A location must declare conformance to the INSPIRE Environmental Monitoring
 Facilities theme and must have exactly one associated GeoSPARQL Geometry.
+
+A location must provide exactly one country code using gn:countryCode. The
+value must be an uppercase ISO 3166-1 alpha-2 code where applicable.
+
+The code AQ is used for Antarctica. For international waters or areas beyond
+national jurisdiction, this profile allows ZZ as a user-assigned ISO 3166-1
+alpha-2 code with a SAP-specific meaning.
+
+Where the country code alone is not semantically sufficient, especially in
+marine contexts such as exclusive economic zones, territorial seas, high seas,
+fishing zones or areas beyond national jurisdiction, the location should also
+provide a dcterms:spatial reference to an authoritative marine gazetteer
+resource.
 
 The geometry is expected to be encoded as a three-dimensional WKT geometry
 using EPSG:4979, where coordinates are expressed as longitude, latitude and
@@ -234,6 +267,69 @@ and elevation is expressed in metres.
     ] ;
 
     ###########################################################################
+    # gn:countryCode
+    ###########################################################################
+
+    sh:property [
+        sh:path gn:countryCode ;
+        sh:name "Country code"@en ;
+        sh:description """
+Mandatory country code associated with the declared coordinates.
+
+The property used is gn:countryCode from the GeoNames Ontology. Its value is
+a two-letter country code from the ISO 3166 list.
+
+Officially assigned ISO 3166-1 alpha-2 codes must be used where applicable,
+for example IT for Italy, DE for Germany, GB for the United Kingdom, and AQ
+for Antarctica.
+
+For locations in international waters or areas beyond national jurisdiction,
+this application profile allows the ISO 3166-1 alpha-2 user-assigned code ZZ
+with the SAP-specific meaning "international waters / areas beyond national
+jurisdiction".
+
+The value ZZ is therefore a CNR ISMAR SAP convention based on the ISO 3166-1
+user-assigned code space, and must not be interpreted as an officially
+assigned ISO country code.
+"""@en ;
+        sh:order 9 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:minLength 2 ;
+        sh:maxLength 2 ;
+        sh:pattern "^[A-Z]{2}$" ;
+        sh:message "A location must have exactly one gn:countryCode value expressed as an uppercase two-letter ISO 3166-1 alpha-2 code where applicable. Use ZZ, as a SAP-specific user-assigned convention, for international waters or areas beyond national jurisdiction."@en ;
+    ] ;
+
+    ###########################################################################
+    # dcterms:spatial
+    ###########################################################################
+
+    sh:property [
+        sh:path dcterms:spatial ;
+        sh:name "Spatial coverage or marine region"@en ;
+        sh:description """
+Optional reference to a spatial coverage, country, territory, marine region,
+exclusive economic zone, territorial sea, high seas area, fishing zone or
+other authoritative geographical entity.
+
+For marine and transitional water observations, values should preferably be
+IRIs from authoritative gazetteers or controlled vocabularies, such as Marine
+Regions MRGID resources, EU Publications Office authority concepts, GeoNames
+features or other persistent geospatial identifiers.
+
+This property complements gn:countryCode. The country code provides a compact
+ISO 3166-1 alpha-2 value, while dcterms:spatial can identify the actual
+geographical or maritime region with greater semantic precision.
+"""@en ;
+        sh:order 10 ;
+        sh:minCount 0 ;
+        sh:nodeKind sh:IRI ;
+        sh:message "Spatial coverage or marine region references, when present, must be IRIs."@en ;
+    ] ;
+
+    ###########################################################################
     # dcterms:isPartOf
     ###########################################################################
 
@@ -241,7 +337,7 @@ and elevation is expressed in metres.
         sh:path dcterms:isPartOf ;
         sh:name "Part of"@en ;
         sh:description "Optional reference to a research infrastructure. The value must be an IRI. The reference form accepts local research infrastructure identifiers and emits them as IRIs, but this profile intentionally allows external infrastructure IRIs because the final URI pattern is not yet fixed."@en ;
-        sh:order 9 ;
+        sh:order 11 ;
         sh:minCount 0 ;
         sh:nodeKind sh:IRI ;
         sh:message "Research infrastructure references, when present, must be IRIs."@en ;
@@ -255,7 +351,7 @@ and elevation is expressed in metres.
         sh:path foaf:depiction ;
         sh:name "Depiction"@en ;
         sh:description "Optional external visual depiction of the location. If provided, the value must be an absolute HTTP or HTTPS IRI."@en ;
-        sh:order 10 ;
+        sh:order 12 ;
         sh:minCount 0 ;
         sh:maxCount 1 ;
         sh:nodeKind sh:IRI ;
@@ -272,7 +368,7 @@ and elevation is expressed in metres.
         sh:path geo:hasMetricSpatialAccuracy ;
         sh:name "Metric spatial accuracy"@en ;
         sh:description "Mandatory metric spatial accuracy expressed in metres as a non-negative numeric value. The reference form emits this value as xsd:double."@en ;
-        sh:order 11 ;
+        sh:order 13 ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:or (
@@ -292,7 +388,7 @@ and elevation is expressed in metres.
         sh:path geo:hasGeometry ;
         sh:name "Geometry"@en ;
         sh:description "The single GeoSPARQL geometry associated with the location. The geometry must be an IRI, must be explicitly typed as geo:Geometry, and must conform to GeometryShape."@en ;
-        sh:order 12 ;
+        sh:order 14 ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:nodeKind sh:IRI ;
