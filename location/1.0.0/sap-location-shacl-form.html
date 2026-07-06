@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SAP Location SHACL Single Page Form</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #dbe3ef;
+      --brand: #075985;
+      --brand2: #0891b2;
+      --ok: #047857;
+      --ok-bg: #ecfdf5;
+      --warn: #92400e;
+      --warn-bg: #fffbeb;
+      --err: #b91c1c;
+      --err-bg: #fef2f2;
+      --code: #0f172a;
+      --code-bg: #eef2f7;
+      --focus: #22d3ee;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 28px 18px 48px; }
+    .hero {
+      border-radius: 28px;
+      padding: 28px;
+      color: white;
+      background: linear-gradient(135deg, #0f172a 0%, #164e63 55%, #155e75 100%);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, .18);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: end;
+    }
+    h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 44px); letter-spacing: -.035em; }
+    h2 { margin: 0; font-size: 22px; }
+    h3 { margin: 0 0 10px; font-size: 16px; }
+    p { line-height: 1.55; }
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 750; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); }
+    .badge.primary { background: #67e8f9; color: #083344; border-color: transparent; }
+    .statusGrid { display: grid; grid-template-columns: repeat(2, 150px); gap: 10px; }
+    .statusBox { border-radius: 18px; padding: 14px; background: rgba(255,255,255,.12); }
+    .statusBox span { display: block; color: #cbd5e1; font-size: 12px; }
+    .statusBox strong { display: block; margin-top: 3px; }
+    .card { margin-top: 20px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 2px 10px rgba(15, 23, 42, .045); }
+    .cardContent { padding: 20px; }
+    .grid { display: grid; gap: 16px; }
+    .shapeGrid { grid-template-columns: 1fr 160px 180px; align-items: end; }
+    .mainGrid { grid-template-columns: 1.1fr .9fr; align-items: start; }
+    .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .field { display: grid; gap: 6px; }
+    label { font-weight: 720; font-size: 14px; }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 13px;
+      padding: 11px 12px;
+      font: inherit;
+      background: white;
+      color: var(--text);
+      outline: none;
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    input:focus, textarea:focus { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(34, 211, 238, .22); }
+    input[readonly] { background: #f1f5f9; }
+    .help { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .wktBox { border-radius: 16px; background: var(--code-bg); color: var(--code); padding: 12px; font-size: 12px; overflow-x: auto; }
+    .tabs { display: flex; gap: 8px; margin-top: 20px; background: #e2e8f0; padding: 5px; border-radius: 18px; width: fit-content; }
+    .tabBtn { border: 0; background: transparent; border-radius: 14px; padding: 10px 18px; cursor: pointer; font-weight: 750; color: #334155; }
+    .tabBtn.active { background: white; color: #0f172a; box-shadow: 0 1px 4px rgba(15, 23, 42, .12); }
+    .btnRow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    button, .fileBtn {
+      border: 0;
+      border-radius: 15px;
+      padding: 11px 15px;
+      font: inherit;
+      font-weight: 760;
+      cursor: pointer;
+      background: var(--brand);
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button.secondary, .fileBtn { background: white; color: #0f172a; border: 1px solid #cbd5e1; }
+    button.ghost { background: #e0f2fe; color: #075985; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .fileBtn input { display: none; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .alert { border-radius: 18px; padding: 15px; border: 1px solid; }
+    .alert.ok { color: var(--ok); background: var(--ok-bg); border-color: #a7f3d0; }
+    .alert.warn { color: var(--warn); background: var(--warn-bg); border-color: #fde68a; }
+    .alert.err { color: var(--err); background: var(--err-bg); border-color: #fecaca; }
+    ul { margin: 8px 0 0; padding-left: 22px; }
+    li { margin: 5px 0; }
+    .turtleArea { min-height: 560px; white-space: pre; overflow: auto; font-size: 12px; line-height: 1.45; }
+    .smallStatus { color: var(--muted); margin-top: 10px; font-size: 13px; }
+    .inline { display: flex; gap: 8px; align-items: center; }
+    .grow { flex: 1; }
+    .sectionNote { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+    .sourceBox { border-radius: 18px; background: #f8fafc; border: 1px dashed #cbd5e1; padding: 14px; }
+    @media (max-width: 900px) { .hero, .shapeGrid, .mainGrid, .two, .three { grid-template-columns: 1fr; } .statusGrid { grid-template-columns: 1fr 1fr; } .tabs { width: 100%; } .tabBtn { flex: 1; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <div class="badges">
+          <span class="badge primary">SAP Location</span>
+          <span class="badge">SHACL-driven helper</span>
+          <span class="badge">GeoSPARQL EPSG:4979</span>
+        </div>
+        <h1>Single-page form per Location RDF</h1>
+        <p>Compila, importa, valida e genera Turtle conforme al profilo SAP Location. Il Turtle esportato dichiara URL e versione dello shape/SAP di riferimento.</p>
+      </div>
+      <div class="statusGrid">
+        <div class="statusBox"><span>Versione</span><strong id="heroVersion">1.0.0</strong></div>
+        <div class="statusBox"><span>Stato</span><strong id="heroState">da compilare</strong></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="cardContent">
+        <div class="grid shapeGrid">
+          <div class="field">
+            <label for="shapeUrl">URL shape.ttl di riferimento *</label>
+            <input id="shapeUrl" type="url" value="https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl" />
+            <p class="help" data-help="shapeUrl"></p>
+          </div>
+          <div class="field">
+            <label for="shapeVersion">Versione shape/SAP *</label>
+            <input id="shapeVersion" value="1.0.0" />
+            <p class="help">Obbligatoria: viene salvata nel Turtle con <code>owl:versionInfo</code> e nei commenti iniziali.</p>
+          </div>
+          <button id="loadShapeBtn" type="button">↻ Leggi URL</button>
+        </div>
+        <p id="shapeStatus" class="smallStatus">Profilo predefinito SAP Location 1.0.0 caricato nel form.</p>
+      </div>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="Sezioni del form">
+      <button class="tabBtn active" data-tab="form" type="button">Form</button>
+      <button class="tabBtn" data-tab="validate" type="button">Validazione</button>
+      <button class="tabBtn" data-tab="turtle" type="button">Turtle</button>
+    </div>
+
+    <section id="panel-form" class="panel active">
+      <div class="grid mainGrid">
+        <section class="card">
+          <div class="cardContent grid">
+            <div class="inline" style="justify-content: space-between; flex-wrap: wrap;">
+              <div>
+                <h2>Dati principali</h2>
+                <p class="sectionNote">Campi descrittivi e identificativi della risorsa <code>geo:Feature</code>.</p>
+              </div>
+              <label class="fileBtn">⇧ Carica Turtle locale
+                <input id="ttlUpload" type="file" accept=".ttl,.rdf,.txt,text/turtle" />
+              </label>
+            </div>
+
+            <div class="grid two">
+              <div class="field">
+                <label for="id">ID locale *</label>
+                <input id="id" placeholder="venice_lagoon_station" autocomplete="off" />
+                <p class="help" id="iriPreview"></p>
+                <p class="help" data-help="id"></p>
+              </div>
+              <div class="field">
+                <label for="notation">skos:notation *</label>
+                <input id="notation" maxlength="35" />
+                <p class="help" data-help="notation"></p>
+              </div>
+              <div class="field">
+                <label for="label">Name / rdfs:label @en *</label>
+                <input id="label" placeholder="Venice Lagoon Station" />
+                <p class="help" data-help="label"></p>
+              </div>
+              <div class="field">
+                <label for="title">Title / dcterms:title @en *</label>
+                <input id="title" placeholder="deve essere identico al label" />
+                <p class="help" data-help="title"></p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="description">Description / dcterms:description @en *</label>
+              <textarea id="description" placeholder="English description of the location..."></textarea>
+              <p class="help" data-help="description"></p>
+            </div>
+
+            <div class="grid two">
+              <div class="field">
+                <label for="identifier">UUID v4 / dcterms:identifier *</label>
+                <div class="inline">
+                  <input id="identifier" class="grow" />
+                  <button id="regenBtn" type="button" class="secondary" title="Rigenera UUID e notation">⚙</button>
+                </div>
+                <p class="help" data-help="identifier"></p>
+              </div>
+              <div class="field">
+                <label for="altLabel">skos:altLabel @und generato</label>
+                <input id="altLabel" readonly />
+                <p class="help" data-help="altLabel"></p>
+              </div>
+              <div class="field">
+                <label for="countryCode">Country code / gn:countryCode *</label>
+                <input id="countryCode" maxlength="2" value="IT" placeholder="IT, DE, AQ, ZZ" />
+                <p class="help" data-help="countryCode"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="cardContent grid">
+            <div>
+              <h2>Geometria e accuratezza spaziale</h2>
+              <p class="sectionNote" data-help="geometry"></p>
+            </div>
+            <div class="grid three">
+              <div class="field">
+                <label for="lon">Longitude *</label>
+                <input id="lon" type="number" step="any" />
+                <p class="help" data-help="lon"></p>
+              </div>
+              <div class="field">
+                <label for="lat">Latitude *</label>
+                <input id="lat" type="number" step="any" />
+                <p class="help" data-help="lat"></p>
+              </div>
+              <div class="field">
+                <label for="elevation">Elevation, m *</label>
+                <input id="elevation" type="number" step="any" value="0" />
+                <p class="help" data-help="elevation"></p>
+              </div>
+            </div>
+            <div class="field">
+              <label for="accuracy">Metric spatial accuracy, m *</label>
+              <input id="accuracy" type="number" min="0" step="any" value="0" />
+              <p class="help" data-help="accuracy"></p>
+            </div>
+            <div class="wktBox mono" id="wktPreview"></div>
+
+            <div class="field">
+              <label for="spatial">dcterms:spatial, opzionale</label>
+              <input id="spatial" placeholder="https://marineregions.org/mrgid/..." />
+              <p class="help" data-help="spatial"></p>
+            </div>
+            <div class="field">
+              <label for="isPartOf">dcterms:isPartOf, opzionale</label>
+              <input id="isPartOf" placeholder="https://.../research-infrastructure/..." />
+              <p class="help" data-help="isPartOf"></p>
+            </div>
+            <div class="field">
+              <label for="depiction">foaf:depiction, opzionale</label>
+              <input id="depiction" placeholder="https://.../image.jpg" />
+              <p class="help" data-help="depiction"></p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="panel-validate" class="panel">
+      <section class="card">
+        <div class="cardContent grid two">
+          <div class="sourceBox">
+            <h3>Vincoli SHACL implementati in questo test locale</h3>
+            <ul>
+              <li>IRI location sotto <span class="mono">https://w3id.org/cnr-ismar/resource/location/{ID}</span>.</li>
+              <li><span class="mono">rdf:type geo:Feature</span> e geometria <span class="mono">geo:Geometry</span>.</li>
+              <li><span class="mono">rdfs:label</span> e <span class="mono">dcterms:title</span> obbligatori, <span class="mono">@en</span>, identici e lunghi almeno 3 caratteri.</li>
+              <li><span class="mono">skos:altLabel</span> generato come <span class="mono">{ID} for future uses</span> con tag <span class="mono">@und</span>.</li>
+              <li><span class="mono">skos:notation</span>, UUID v4, country code, INSPIRE EF.</li>
+              <li>Geometria obbligatoria <span class="mono">POINT Z(lon lat elevation)</span> EPSG:4979 con range su longitude/latitude.</li>
+              <li><span class="mono">geo:hasMetricSpatialAccuracy</span> obbligatorio, non negativo, espresso in metri.</li>
+              <li>IRI opzionali per <span class="mono">spatial</span>, <span class="mono">isPartOf</span>, <span class="mono">depiction</span>.</li>
+            </ul>
+          </div>
+          <div id="validationResult" class="grid"></div>
+        </div>
+      </section>
+    </section>
+
+    <section id="panel-turtle" class="panel">
+      <section class="card">
+        <div class="cardContent grid">
+          <div class="inline" style="justify-content: space-between; flex-wrap: wrap;">
+            <div>
+              <h2>Turtle generato</h2>
+              <p class="sectionNote">Include <code>dcterms:conformsTo</code> verso INSPIRE EF e shape URL, più <code>owl:versionInfo</code>.</p>
+            </div>
+            <div class="btnRow">
+              <button id="copyBtn" type="button" class="secondary">⧉ Copia</button>
+              <button id="downloadBtn" type="button">↓ Salva .ttl</button>
+            </div>
+          </div>
+          <div id="exportWarning" class="alert err" style="display:none;">Il Turtle è mostrato in anteprima, ma copia/download sono disabilitati finché la validazione non è conforme.</div>
+          <textarea id="turtleOutput" class="turtleArea mono" readonly></textarea>
+        </div>
+      </section>
+    </section>
+  </main>
+
+<script>
+(() => {
+  'use strict';
+
+  const PREFIXES = {
+    saploc: 'https://w3id.org/cnr-ismar/sap/location/1.0.0/',
+    locshape: 'https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl#',
+    geo: 'http://www.opengis.net/ont/geosparql#',
+    gn: 'https://www.geonames.org/ontology#',
+    dcterms: 'http://purl.org/dc/terms/',
+    rdfs: 'http://www.w3.org/2000/01/rdf-schema#',
+    skos: 'http://www.w3.org/2004/02/skos/core#',
+    foaf: 'http://xmlns.com/foaf/0.1/',
+    rdf: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    xsd: 'http://www.w3.org/2001/XMLSchema#',
+    owl: 'http://www.w3.org/2002/07/owl#'
+  };
+
+  const DEFAULT_SHAPE_URL = 'https://w3id.org/cnr-ismar/sap/location/1.0.0/shapes.ttl';
+  const LOCATION_BASE = 'https://w3id.org/cnr-ismar/resource/location/';
+  const INSPIRE_EF = 'http://inspire.ec.europa.eu/theme/ef';
+  const CRS_4979 = 'http://www.opengis.net/def/crs/EPSG/0/4979';
+  const SAP_VERSION = '1.0.0';
+
+  const HELP = {
+    shapeUrl: 'URL dello SHACL shape usato come riferimento semantico e di validazione. Se lo shape cambia versione, il Turtle esportato deve dichiarare chiaramente a quale URL e versione fa riferimento.',
+    id: "La risorsa Location deve essere identificata da un IRI nel formato https://w3id.org/cnr-ismar/resource/location/{ID}. L'ID deve iniziare con una lettera o un numero e può contenere lettere, numeri, trattini o underscore.",
+    label: 'Human-readable feature name. Viene emesso come rdfs:label con language tag @en. Deve essere identico a dcterms:title e contenere almeno tre caratteri.',
+    title: 'Human-readable feature title. Viene emesso come dcterms:title con language tag @en. Deve essere identico a rdfs:label e contenere almeno tre caratteri.',
+    altLabel: "Alternative label generata dal form a partire dall'ID locale secondo la convenzione '{ID} for future uses'. Viene emessa come skos:altLabel con language tag @und.",
+    notation: 'Identificatore alternativo di sistema, pensato per sistemi che richiedono identificatori alfanumerici compatti, ad esempio SensorThings API / FROST Server. Deve essere xsd:string, massimo 35 caratteri, solo lettere, numeri e underscore.',
+    identifier: 'Identificatore UUID versione 4 generato dal sistema per la location. Deve essere espresso come xsd:string nella rappresentazione testuale canonica UUID.',
+    description: 'Descrizione testuale della location. Viene emessa come dcterms:description con language tag @en e deve contenere almeno tre caratteri.',
+    countryCode: 'Codice paese obbligatorio associato alle coordinate dichiarate. Usare un codice ISO 3166-1 alpha-2 maiuscolo dove applicabile; AQ per Antarctica; ZZ come convenzione SAP per acque internazionali o aree oltre giurisdizione nazionale.',
+    spatial: 'Riferimento opzionale a copertura spaziale, paese, territorio, regione marina, zona economica esclusiva, mare territoriale, high seas area o altra entità geografica autorevole. Per contesti marini sono preferibili IRI persistenti, ad esempio Marine Regions MRGID.',
+    isPartOf: 'Riferimento opzionale a una research infrastructure. Il valore deve essere un IRI; il profilo consente anche IRI esterni perché il pattern finale delle URI infrastrutturali non è ancora fissato.',
+    depiction: 'Rappresentazione visuale esterna opzionale della location. Se presente, deve essere un IRI assoluto HTTP o HTTPS senza spazi, parentesi angolari o virgolette.',
+    accuracy: "Accuratezza spaziale metrica obbligatoria espressa in metri come valore numerico non negativo. È legata alla qualità/accuratezza delle coordinate della geometria, quindi è collocata nella sezione Geometria.",
+    geometry: 'La location deve avere esattamente una geometria GeoSPARQL. La geometria è codificata come WKT tridimensionale EPSG:4979 nel formato POINT Z(longitude latitude elevation). Longitudine e latitudine sono in gradi decimali; elevazione in metri.',
+    lon: 'Longitudine, cioè coordinata est, in gradi decimali. È obbligatoria perché geo:hasGeometry è obbligatoria. Deve essere compresa tra -180 e 180.',
+    lat: 'Latitudine in gradi decimali. È obbligatoria perché geo:hasGeometry è obbligatoria. Deve essere compresa tra -90 e 90.',
+    elevation: 'Altezza ellissoidica WGS84 in metri. Può essere positiva o negativa ed è parte del POINT Z EPSG:4979 obbligatorio.'
+  };
+
+  const ids = ['shapeUrl','shapeVersion','id','notation','label','title','description','identifier','altLabel','countryCode','lon','lat','elevation','accuracy','spatial','isPartOf','depiction'];
+  const el = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+  const panels = {
+    form: document.getElementById('panel-form'),
+    validate: document.getElementById('panel-validate'),
+    turtle: document.getElementById('panel-turtle')
+  };
+
+  function initHelp() {
+    document.querySelectorAll('[data-help]').forEach(node => {
+      const key = node.getAttribute('data-help');
+      node.textContent = HELP[key] || '';
+    });
+  }
+
+  function uuidv4() {
+    if (globalThis.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => {
+      const r = crypto.getRandomValues(new Uint8Array(1))[0] & 15;
+      return (+c ^ r >> +c / 4).toString(16);
+    });
+  }
+
+  function compactNotation(id) {
+    const s = String(id || '').replace(/[^A-Za-z0-9_]/g, '_').replace(/^_+/, '').slice(0, 35);
+    return s || 'location_1';
+  }
+
+  function lit(value) {
+    return String(value ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+  }
+
+  function unescapeTurtleLiteral(value) {
+    return String(value || '').replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+  }
+
+  function isIRI(value) {
+    return /^https?:\/\/[^\s<>"']+$/.test(value || '');
+  }
+
+  function getForm() {
+    const id = el.id.value.trim();
+    const title = el.title.value || el.label.value;
+    const notation = el.notation.value || compactNotation(id);
+    return {
+      shapeUrl: el.shapeUrl.value.trim(),
+      shapeVersion: el.shapeVersion.value.trim(),
+      id,
+      notation,
+      label: el.label.value,
+      title,
+      description: el.description.value,
+      identifier: el.identifier.value.trim(),
+      countryCode: String(el.countryCode.value || '').toUpperCase().trim(),
+      lon: String(el.lon.value ?? '').trim(),
+      lat: String(el.lat.value ?? '').trim(),
+      elevation: String(el.elevation.value ?? '').trim(),
+      accuracy: String(el.accuracy.value ?? '').trim(),
+      spatial: el.spatial.value.trim(),
+      isPartOf: el.isPartOf.value.trim(),
+      depiction: el.depiction.value.trim()
+    };
+  }
+
+  function setForm(values) {
+    Object.entries(values).forEach(([key, value]) => {
+      if (el[key] && value !== undefined && value !== null && value !== '') el[key].value = value;
+    });
+    updateDerived();
+  }
+
+  function validateForm(form) {
+    const issues = [];
+    const warnings = [];
+    const idRe = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
+    const uuidv4Re = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+    const notationRe = /^[A-Za-z0-9_]{1,35}$/;
+
+    if (!idRe.test(form.id)) issues.push('ID obbligatorio: deve iniziare con lettera o numero e contenere solo lettere, numeri, trattino o underscore.');
+    if (!form.label || form.label.length < 3) issues.push('rdfs:label @en obbligatorio e lungo almeno 3 caratteri.');
+    if (!form.title || form.title.length < 3) issues.push('dcterms:title @en obbligatorio e lungo almeno 3 caratteri.');
+    if (form.label !== form.title) issues.push('rdfs:label e dcterms:title devono essere identici.');
+    if (!form.description || form.description.length < 3) issues.push('dcterms:description @en obbligatoria e lunga almeno 3 caratteri.');
+    if (!notationRe.test(form.notation)) issues.push('skos:notation deve contenere 1-35 caratteri: lettere, numeri o underscore.');
+    if (!uuidv4Re.test(form.identifier)) issues.push('dcterms:identifier deve essere un UUID versione 4 canonico.');
+    if (!/^[A-Z]{2}$/.test(form.countryCode)) issues.push('gn:countryCode deve essere un codice maiuscolo di due lettere. Usa ZZ per acque internazionali secondo convenzione SAP.');
+
+    const lon = Number(form.lon);
+    const lat = Number(form.lat);
+    const elevation = Number(form.elevation);
+    const accuracy = Number(form.accuracy);
+
+    if (form.lon === '') issues.push('Longitudine obbligatoria: la geometria geo:hasGeometry è obbligatoria e richiede POINT Z(longitude latitude elevation).');
+    else if (!Number.isFinite(lon) || lon < -180 || lon > 180) issues.push('Longitudine non valida: deve essere compresa tra -180 e 180.');
+
+    if (form.lat === '') issues.push('Latitudine obbligatoria: la geometria geo:hasGeometry è obbligatoria e richiede POINT Z(longitude latitude elevation).');
+    else if (!Number.isFinite(lat) || lat < -90 || lat > 90) issues.push('Latitudine non valida: deve essere compresa tra -90 e 90.');
+
+    if (form.elevation === '') issues.push('Elevazione obbligatoria: POINT Z EPSG:4979 richiede anche la quota ellissoidica in metri.');
+    else if (!Number.isFinite(elevation)) issues.push('Elevazione non valida: deve essere numerica, in metri.');
+
+    if (form.accuracy === '') issues.push("Accuratezza spaziale metrica obbligatoria: descrive l'accuratezza delle coordinate della geometria ed è espressa in metri.");
+    else if (!Number.isFinite(accuracy) || accuracy < 0) issues.push('Accuratezza spaziale metrica non valida: deve essere un numero non negativo espresso in metri.');
+
+    if (form.spatial && !isIRI(form.spatial)) issues.push('dcterms:spatial, se presente, deve essere un IRI HTTP/HTTPS valido.');
+    if (form.isPartOf && !isIRI(form.isPartOf)) issues.push('dcterms:isPartOf, se presente, deve essere un IRI HTTP/HTTPS valido.');
+    if (form.depiction && !isIRI(form.depiction)) issues.push('foaf:depiction, se presente, deve essere un IRI HTTP/HTTPS assoluto senza spazi.');
+    if (!form.shapeUrl || !isIRI(form.shapeUrl)) issues.push('URL dello shape.ttl obbligatorio e deve essere un IRI HTTP/HTTPS.');
+    if (!form.shapeVersion) issues.push('Versione dello shape/SAP obbligatoria: deve essere salvata nel Turtle generato.');
+
+    if (form.countryCode === 'ZZ' && !form.spatial) warnings.push('Hai indicato ZZ: per aree marine o oltre giurisdizione nazionale è consigliato dcterms:spatial verso un gazetteer autorevole, ad esempio Marine Regions.');
+    if (form.countryCode !== 'ZZ' && !form.spatial) warnings.push('dcterms:spatial è opzionale, ma può aumentare la precisione semantica, specialmente in contesti marini o transfrontalieri.');
+
+    return { issues, warnings };
+  }
+
+  function generateTurtle(form) {
+    const locationIRI = `${LOCATION_BASE}${form.id}`;
+    const geometryIRI = `${locationIRI}/geometry`;
+    const altLabel = `${form.id} for future uses`;
+    const wkt = `<${CRS_4979}> POINT Z(${form.lon} ${form.lat} ${form.elevation})`;
+    const optionalSpatial = form.spatial ? ` ;\n    dcterms:spatial <${form.spatial}>` : '';
+    const optionalPartOf = form.isPartOf ? ` ;\n    dcterms:isPartOf <${form.isPartOf}>` : '';
+    const optionalDepiction = form.depiction ? ` ;\n    foaf:depiction <${form.depiction}>` : '';
+
+    return `@prefix saploc:   <${PREFIXES.saploc}> .\n@prefix locshape: <${PREFIXES.locshape}> .\n@prefix geo:      <${PREFIXES.geo}> .\n@prefix gn:       <${PREFIXES.gn}> .\n@prefix dcterms:  <${PREFIXES.dcterms}> .\n@prefix rdfs:     <${PREFIXES.rdfs}> .\n@prefix skos:     <${PREFIXES.skos}> .\n@prefix foaf:     <${PREFIXES.foaf}> .\n@prefix rdf:      <${PREFIXES.rdf}> .\n@prefix xsd:      <${PREFIXES.xsd}> .\n@prefix owl:      <${PREFIXES.owl}> .\n\n# Generated by SAP Location single-page form\n# Shape URL: ${form.shapeUrl}\n# Shape/SAP version: ${form.shapeVersion}\n\n<${locationIRI}>\n    a geo:Feature ;\n    dcterms:conformsTo <${INSPIRE_EF}> , <${form.shapeUrl}> ;\n    owl:versionInfo "${lit(form.shapeVersion)}" ;\n    rdfs:label "${lit(form.label)}"@en ;\n    dcterms:title "${lit(form.title)}"@en ;\n    skos:altLabel "${lit(altLabel)}"@und ;\n    skos:notation "${lit(form.notation)}"^^xsd:string ;\n    dcterms:identifier "${lit(form.identifier)}"^^xsd:string ;\n    dcterms:description "${lit(form.description)}"@en ;\n    gn:countryCode "${lit(form.countryCode)}"^^xsd:string${optionalSpatial}${optionalPartOf}${optionalDepiction} ;\n    geo:hasMetricSpatialAccuracy "${lit(form.accuracy)}"^^xsd:double ;\n    geo:hasGeometry <${geometryIRI}> .\n\n<${geometryIRI}>\n    a geo:Geometry ;\n    geo:asWKT "${lit(wkt)}"^^geo:wktLiteral .\n`;
+  }
+
+  function parseObject(turtle, patterns) {
+    for (const pattern of patterns) {
+      const m = turtle.match(pattern);
+      if (m) return unescapeTurtleLiteral(m[1]);
+    }
+    return '';
+  }
+
+  function parseUploadedTurtle(text) {
+    const iriMatch = text.match(/<([^>]*\/resource\/location\/[A-Za-z0-9][A-Za-z0-9_-]*)>\s+(?:a|rdf:type|\n)/m) ||
+      text.match(/<([^>]*\/resource\/location\/[A-Za-z0-9][A-Za-z0-9_-]*)>/m);
+    const locationIRI = iriMatch?.[1] || '';
+    const id = locationIRI.split('/').pop() || '';
+    const title = parseObject(text, [/dcterms:title\s+"((?:\\.|[^"\\])*)"@en/, /rdfs:label\s+"((?:\\.|[^"\\])*)"@en/]);
+    const label = parseObject(text, [/rdfs:label\s+"((?:\\.|[^"\\])*)"@en/]) || title;
+    const description = parseObject(text, [/dcterms:description\s+"((?:\\.|[^"\\])*)"@en/]);
+    const notation = parseObject(text, [/skos:notation\s+"((?:\\.|[^"\\])*)"\^\^xsd:string/, /skos:notation\s+"((?:\\.|[^"\\])*)"/]);
+    const identifier = parseObject(text, [/dcterms:identifier\s+"((?:\\.|[^"\\])*)"\^\^xsd:string/, /dcterms:identifier\s+"((?:\\.|[^"\\])*)"/]);
+    const countryCode = parseObject(text, [/gn:countryCode\s+"([A-Za-z]{2})"/]).toUpperCase();
+    const spatial = parseObject(text, [/dcterms:spatial\s+<([^>]+)>/]);
+    const isPartOf = parseObject(text, [/dcterms:isPartOf\s+<([^>]+)>/]);
+    const depiction = parseObject(text, [/foaf:depiction\s+<([^>]+)>/]);
+    const accuracy = parseObject(text, [/geo:hasMetricSpatialAccuracy\s+"?([-+]?\d+(?:\.\d+)?)"?(?:\^\^xsd:(?:double|decimal|integer))?/]);
+    const wkt = parseObject(text, [/geo:asWKT\s+"((?:\\.|[^"\\])*)"\^\^geo:wktLiteral/]);
+    const coordMatch = wkt.match(/POINT\s+Z\s*\(\s*([-+]?\d+(?:\.\d+)?)\s+([-+]?\d+(?:\.\d+)?)\s+([-+]?\d+(?:\.\d+)?)\s*\)/i);
+    const shapeUrl = parseObject(text, [/dcterms:conformsTo\s+<([^>]*shapes\.ttl)>/]);
+    const version = parseObject(text, [/owl:versionInfo\s+"([^"]+)"/, /saploc:profileVersion\s+"([^"]+)"/]);
+
+    return {
+      id, label, title, description, notation, identifier, countryCode, spatial, isPartOf, depiction, accuracy,
+      lon: coordMatch?.[1] || '', lat: coordMatch?.[2] || '', elevation: coordMatch?.[3] || '',
+      shapeUrl, shapeVersion: version
+    };
+  }
+
+  function updateDerived() {
+    const form = getForm();
+    if (!el.title.value && el.label.value) el.title.value = el.label.value;
+    if (!el.notation.value && form.id) el.notation.value = compactNotation(form.id);
+    el.countryCode.value = form.countryCode;
+    el.altLabel.value = `${form.id || '{ID}'} for future uses`;
+    document.getElementById('iriPreview').textContent = `IRI generato: ${LOCATION_BASE}${form.id || '{ID}'}`;
+    document.getElementById('wktPreview').textContent = `<${CRS_4979}> POINT Z(${form.lon || 'lon'} ${form.lat || 'lat'} ${form.elevation || 'elev'})`;
+
+    const fresh = getForm();
+    const validation = validateForm(fresh);
+    const turtle = generateTurtle(fresh);
+    const canExport = validation.issues.length === 0;
+
+    document.getElementById('heroVersion').textContent = fresh.shapeVersion || '-';
+    document.getElementById('heroState').textContent = canExport ? 'valido' : 'da correggere';
+    document.getElementById('turtleOutput').value = turtle;
+    document.getElementById('copyBtn').disabled = !canExport;
+    document.getElementById('downloadBtn').disabled = !canExport;
+    document.getElementById('exportWarning').style.display = canExport ? 'none' : 'block';
+    renderValidation(validation);
+  }
+
+  function renderValidation(validation) {
+    const root = document.getElementById('validationResult');
+    const issueHtml = validation.issues.length
+      ? `<div class="alert err"><h3>Errori da correggere</h3><ul>${validation.issues.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul></div>`
+      : '<div class="alert ok"><h3>Conforme</h3><p>Nessun errore bloccante: puoi copiare o scaricare il Turtle.</p></div>';
+    const warnHtml = validation.warnings.length
+      ? `<div class="alert warn"><h3>Avvisi non bloccanti</h3><ul>${validation.warnings.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul></div>`
+      : '';
+    root.innerHTML = issueHtml + warnHtml;
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  async function loadShapeFromUrl() {
+    const status = document.getElementById('shapeStatus');
+    try {
+      const res = await fetch(el.shapeUrl.value.trim(), { headers: { Accept: 'text/turtle,text/plain,*/*' } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const ttl = await res.text();
+      const version = ttl.match(/owl:versionInfo\s+"([^"]+)"/)?.[1];
+      if (version) el.shapeVersion.value = version;
+      status.textContent = `Shape raggiunto. Versione rilevata: ${version || 'non trovata: mantenere/compilare manualmente'}. Nota: questo test locale implementa il profilo SAP Location noto e usa le description come guida alla compilazione.`;
+    } catch (e) {
+      status.textContent = `Non riesco a leggere direttamente lo shape URL, probabilmente per CORS o rete: ${e.message}. Puoi comunque indicare URL e versione; verranno salvati nel Turtle.`;
+    }
+    updateDerived();
+  }
+
+  function copyTurtle() {
+    const text = document.getElementById('turtleOutput').value;
+    navigator.clipboard.writeText(text).then(() => {
+      document.getElementById('shapeStatus').textContent = 'Turtle copiato negli appunti.';
+    }).catch(() => {
+      document.getElementById('shapeStatus').textContent = 'Copia negli appunti non disponibile: seleziona il testo Turtle e copialo manualmente.';
+    });
+  }
+
+  function downloadTurtle() {
+    const form = getForm();
+    const ttl = generateTurtle(form);
+    const blob = new Blob([ttl], { type: 'text/turtle;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${form.id || 'location'}.ttl`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function wireEvents() {
+    document.querySelectorAll('.tabBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tabBtn').forEach(b => b.classList.toggle('active', b === btn));
+        Object.entries(panels).forEach(([key, panel]) => panel.classList.toggle('active', key === tab));
+      });
+    });
+
+    ids.forEach(id => {
+      if (!el[id]) return;
+      el[id].addEventListener('input', () => {
+        if (id === 'id') {
+          const prevAuto = el.notation.dataset.auto !== 'false';
+          if (prevAuto) el.notation.value = compactNotation(el.id.value.trim());
+        }
+        if (id === 'notation') el.notation.dataset.auto = 'false';
+        if (id === 'label' && (!el.title.value || el.title.dataset.auto !== 'false')) {
+          el.title.value = el.label.value;
+          el.title.dataset.auto = 'true';
+        }
+        if (id === 'title') el.title.dataset.auto = 'false';
+        updateDerived();
+      });
+    });
+
+    document.getElementById('loadShapeBtn').addEventListener('click', loadShapeFromUrl);
+    document.getElementById('copyBtn').addEventListener('click', copyTurtle);
+    document.getElementById('downloadBtn').addEventListener('click', downloadTurtle);
+    document.getElementById('regenBtn').addEventListener('click', () => {
+      el.identifier.value = uuidv4();
+      el.notation.value = compactNotation(el.id.value.trim());
+      el.notation.dataset.auto = 'true';
+      updateDerived();
+    });
+
+    document.getElementById('ttlUpload').addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const parsed = parseUploadedTurtle(String(reader.result || ''));
+        setForm(parsed);
+        document.getElementById('shapeStatus').textContent = `File locale caricato: ${file.name}. I campi riconosciuti sono stati importati e rivalidati.`;
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  function boot() {
+    initHelp();
+    el.shapeUrl.value = DEFAULT_SHAPE_URL;
+    el.shapeVersion.value = SAP_VERSION;
+    el.identifier.value = uuidv4();
+    el.notation.dataset.auto = 'true';
+    wireEvents();
+    updateDerived();
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
