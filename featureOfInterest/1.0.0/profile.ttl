@@ -1,1 +1,111 @@
 
+@prefix sapfoi:   <https://w3id.org/cnr-ismar/sap/featureofinterest/1.0.0/> .
+@prefix prof:     <http://www.w3.org/ns/dx/prof/> .
+@prefix role:     <http://www.w3.org/ns/dx/prof/role/> .
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix dcat:     <http://www.w3.org/ns/dcat#> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+sapfoi:
+    a prof:Profile ;
+    a dcterms:Standard ;
+
+    dcterms:title
+        "CNR ISMAR Semantic Application Profile for Features of Interest"@en ;
+
+    dcterms:description
+        "Application profile for describing Features of Interest as real-world entities."@en ;
+
+    dcterms:identifier
+        "cnr-ismar-sap-featureofinterest-1.0.0" ;
+
+    owl:versionInfo "1.0.0" ;
+
+    dcterms:issued "2026-06-29"^^xsd:date ;
+
+    dcterms:creator
+        <https://w3id.org/cnr-ismar/organization/ismar> ;
+
+    dcterms:publisher
+        <https://w3id.org/cnr-ismar/organization/ismar> ;
+
+    dcterms:license
+        <https://creativecommons.org/licenses/by/4.0/> ;
+
+    dcterms:conformsTo
+        <https://www.w3.org/TR/shacl/> ;
+
+    dcterms:conformsTo
+        <https://www.ogc.org/standards/geosparql/> ;
+
+    dcterms:conformsTo
+        <https://docs.ogc.org/is/18-088/18-088.html> ;
+
+    prof:hasResource sapfoi:shacl-resource ;
+    prof:hasResource sapfoi:html-documentation-resource ;
+    prof:hasResource sapfoi:examples-resource .
+
+###############################################################################
+# SHACL validation resource
+###############################################################################
+
+sapfoi:shacl-resource
+    a prof:ResourceDescriptor ;
+
+    dcterms:title
+        "SHACL shapes for the CNR ISMAR Feature Of Interest Application Profile"@en ;
+
+    dcterms:description
+        "SHACL shapes used to validate RDF descriptions of Features of Interest conforming to this application profile."@en ;
+
+    prof:hasRole role:validation ;
+
+    dcterms:format
+        <https://www.iana.org/assignments/media-types/text/turtle> ;
+
+    prof:hasArtifact
+        <https://w3id.org/cnr-ismar/sap/featureofinterest/1.0.0/shapes.ttl> .
+
+###############################################################################
+# Human-readable documentation
+###############################################################################
+
+sapfoi:html-documentation-resource
+    a prof:ResourceDescriptor ;
+
+    dcterms:title
+        "Human-readable documentation"@en ;
+
+    dcterms:description
+        "HTML documentation of the CNR ISMAR Feature Of Interest Application Profile."@en ;
+
+    prof:hasRole role:guidance ;
+
+    dcterms:format
+        <https://www.iana.org/assignments/media-types/text/html> ;
+
+    prof:hasArtifact
+        <https://w3id.org/cnr-ismar/sap/featureofinterest/1.0.0/doc> .
+
+###############################################################################
+# Examples
+###############################################################################
+
+sapfoi:examples-resource
+    a prof:ResourceDescriptor ;
+
+    dcterms:title
+        "RDF examples"@en ;
+
+    dcterms:description
+        "Valid and invalid RDF examples for the CNR ISMAR Feature Of Interest Application Profile."@en ;
+
+    prof:hasRole role:example ;
+
+    dcterms:format
+        <https://www.iana.org/assignments/media-types/text/turtle> ;
+
+    prof:hasArtifact
+        <https://w3id.org/cnr-ismar/sap/featureofinterest/1.0.0/examples/> .
