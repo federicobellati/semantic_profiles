@@ -1,5 +1,5 @@
 
-@prefix sapfoi:   <https://w3id.org/cnr-ismar/sap/featureofinterest/1.0.0/> .
+@prefix sapfoi:   <https://w3id.org/cnr-ismar/sap/featureOfInterest/1.0.0/> .
 @prefix prof:     <http://www.w3.org/ns/dx/prof/> .
 @prefix role:     <http://www.w3.org/ns/dx/prof/role/> .
 @prefix dcterms:  <http://purl.org/dc/terms/> .
