@@ -41,7 +41,7 @@ saploc:shacl-resource
 ###############################################################################
 # Human-readable documentation
 ###############################################################################
-#
+
 #saploc:html-documentation-resource
 #    a prof:ResourceDescriptor ;
 #    dcterms:title "Human-readable documentation"@en ;
